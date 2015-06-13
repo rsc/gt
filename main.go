@@ -4,7 +4,7 @@
 
 // Gt is a wrapper for ``go test'' that caches test results.
 //
-// The usage of ``gt'' is identical to that of ``go test.''
+// The usage of ``gt'' is nearly identical to that of ``go test.''
 //
 //	gt [-f] [-l] [arguments for "go test"]
 //
