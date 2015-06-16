@@ -17,7 +17,8 @@
 //
 // The -l flag causes gt to list the uncached tests it would run.
 //
-// Cached test results are saved in $HOME/Library/Caches/go-test-cache on OS X
+// Cached test results are saved in $CACHE/go-test-cache if $CACHE is set,
+// or else $HOME/Library/Caches/go-test-cache on OS X
 // and $HOME/.cache/go-test-cache on other systems.
 // It is always safe to delete these directories if they become too large.
 //
@@ -169,7 +170,9 @@ func main() {
 		first = false
 	}
 
-	if runtime.GOOS == "darwin" {
+	if env := os.Getenv("CACHE"); env != "" {
+		cacheDir = fmt.Sprintf("%s/go-test-cache", env)
+	} else if runtime.GOOS == "darwin" {
 		cacheDir = fmt.Sprintf("%s/Library/Caches/go-test-cache", os.Getenv("HOME"))
 	} else {
 		cacheDir = fmt.Sprintf("%s/.cache/go-test-cache", os.Getenv("HOME"))
