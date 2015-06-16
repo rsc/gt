@@ -82,6 +82,7 @@ func usage() {
 var (
 	flagV      bool
 	flagShort  bool
+	flagRace   bool
 	flagList   bool
 	flagForce  bool
 	flagTiming bool
@@ -322,6 +323,9 @@ func computeTestHash(p *Package) {
 	computePkgHash(p)
 	h := sha1.New()
 	fmt.Fprintf(h, "test\n")
+	if flagRace {
+		fmt.Fprintf(h, "-race\n")
+	}
 	if flagShort {
 		fmt.Fprintf(h, "-short\n")
 	}
@@ -484,6 +488,11 @@ func parseFlags() (opts, pkgs []string) {
 			flagV = true
 			opts = append(opts, arg)
 			donePkgs = len(pkgs) > 0
+			continue
+		}
+		if arg == "-race" {
+			flagRace = true
+			opts = append(opts, arg)
 			continue
 		}
 		if arg == "-short" {
