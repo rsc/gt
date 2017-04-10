@@ -429,7 +429,7 @@ func showTestResult(path string) {
 	}
 }
 
-var endRE = regexp.MustCompile(`\A(\?|ok|FAIL) ? ? ?\t([^ \t]+)\t([0-9.]+s|\[.*\])\n\z`)
+var endRE = regexp.MustCompile(`\A(\?|ok|FAIL) ? ? ?\t([^ \t]+)\t(([0-9.]+s)?\s*(\[.*\])?)\n\z`)
 
 func readTestResult(r *bufio.Reader, path string) {
 	var buf bytes.Buffer
@@ -450,6 +450,10 @@ func readTestResult(r *bufio.Reader, path string) {
 
 		if m[1] == "FAIL" {
 			failed = true
+		}
+
+		if m[2] != "" && m[2] != path {
+			log.Fatalf("reading test output for %s: found %s instead", path, m[2])
 		}
 
 		fmt.Fprintf(&buf, "%s (cached)\n", strings.TrimSuffix(line, "\n"))
