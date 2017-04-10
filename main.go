@@ -436,6 +436,9 @@ func readTestResult(r *bufio.Reader, path string) {
 	for {
 		line, err := r.ReadString('\n')
 		os.Stdout.WriteString(line)
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			log.Fatalf("reading test output for %s: %v", path, err)
 		}
