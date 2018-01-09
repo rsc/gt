@@ -86,6 +86,7 @@ var (
 	flagList   bool
 	flagForce  bool
 	flagTiming bool
+	flagTags   string
 	failed     bool
 	cacheDir   string
 	start      = time.Now()
@@ -291,7 +292,16 @@ type Package struct {
 }
 
 func readPkgs(pkgs []string) {
-	out, err := exec.Command("go", append([]string{"list", "-json"}, pkgs...)...).CombinedOutput()
+	var (
+		out []byte
+		err error
+	)
+	if flagTags != "" {
+		out, err = exec.Command("go", append([]string{"list", flagTags, "-json"}, pkgs...)...).CombinedOutput()
+	} else {
+		out, err = exec.Command("go", append([]string{"list", "-json"}, pkgs...)...).CombinedOutput()
+	}
+
 	if err != nil {
 		log.Fatalf("go list: %v\n%s", err, out)
 	}
@@ -331,6 +341,9 @@ func computeTestHash(p *Package) {
 	}
 	if flagV {
 		fmt.Fprintf(h, "-v\n")
+	}
+	if flagTags != "" {
+		fmt.Fprintf(h, flagTags+"\n")
 	}
 	fmt.Fprintf(h, "pkg %s\n", p.pkgHash)
 	for _, imp := range p.TestImports {
@@ -501,6 +514,11 @@ func parseFlags() (opts, pkgs []string) {
 		}
 		if arg == "-short" {
 			flagShort = true
+			opts = append(opts, arg)
+			continue
+		}
+		if len(arg) >= 6 && arg[:6] == "-tags=" {
+			flagTags = arg
 			opts = append(opts, arg)
 			continue
 		}
